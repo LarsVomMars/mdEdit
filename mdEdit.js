@@ -90,12 +90,21 @@ class mdEdit {
 
             htmlString += s + '<br/>';
         }
-                    /*
+
+        htmlString = mdEdit.parseCode(htmlString);
+        /*
             s = this.parseLists();
             s = this.parseTable();
-            s = this.parseCode();
-            */
+
+        */
         return htmlString;
+    }
+
+    static parseCode(s) {
+        return s.replace(/`{3}.*`{3}|`.*`/, match => {
+            if (match.startsWith('\`\`\`')) return `<pre><code>${match.slice(3, match.length - 3)}</code></pre>`;
+            return `<pre><code>${match.slice(1, match.length - 1)}</code></pre>`;
+        })
     }
 }
 

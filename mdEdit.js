@@ -92,14 +92,13 @@ class mdEdit {
         }
 
         // Replace headings
-        for (let s of split) {
-            s = s.replace(/^######.+$/, match => '<h6>' + match.slice(6) + '</h6>')
+        for (const s of split) {
+            htmlString += s.replace(/^######.+$/, match => '<h6>' + match.slice(6) + '</h6>')
                 .replace(/^#####.+$/, match => '<h5>' + match.slice(5) + '</h5>')
                 .replace(/^####.+$/, match => '<h4>' + match.slice(4) + '</h4>')
                 .replace(/^###.+$/, match => '<h3>' + match.slice(3) + '</h3>')
                 .replace(/^##.+$/, match => '<h2>' + match.slice(2) + '</h2>')
                 .replace(/^#.+$/, match => '<h1>' + match.slice(1) + '</h1>');
-            htmlString += s + '<br/>';
         }
 
         // Images

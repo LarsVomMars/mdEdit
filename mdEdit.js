@@ -30,6 +30,7 @@ class mdEdit {
         this.display = document.querySelector('.md-display iframe');
         this.displayContent = this.display.contentWindow.document;
 
+        this.editor.value = this.toInterpret;
         this.editor.addEventListener('input', () => this.interpret());
         this.interpret();
     }
@@ -85,9 +86,13 @@ class mdEdit {
             if (s.match(/~~.*~~/))
                 s = s.replace(/~~.*~~/, match => '<s>' + match.slice(2, match.length - 2) + '</s>');
 
-            
-            htmlString += s;
+            htmlString += s + '<br/>';
         }
+                    /*
+            s = this.parseLists();
+            s = this.parseTable();
+            s = this.parseCode();
+            */
         return htmlString;
     }
 }

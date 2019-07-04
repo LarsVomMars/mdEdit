@@ -62,6 +62,7 @@ class mdEdit {
      */
     md2html() {
         let htmlString = '';
+        // Replace headings
         for (let s of this.toInterpret.split('\n')) {
             // Headings
             s = s.replace(/^######.+$/, match => '<h6>' + match.slice(6) + '</h6>');
@@ -70,35 +71,25 @@ class mdEdit {
             s = s.replace(/^###.+$/, match => '<h3>' + match.slice(3) + '</h3>');
             s = s.replace(/^##.+$/, match => '<h2>' + match.slice(2) + '</h2>');
             s = s.replace(/^#.+$/, match => '<h1>' + match.slice(1) + '</h1>');
-
-            // Images
-            if (s.match(/!\[.*]\(.*\)/)) {
-                s = s.replace(/!\[.*]\(.*\)/, match => {
-                    const alt = match.match(/!\[.*]/)[0];
-                    const link = match.match(/\(.*\)/)[0];
-                    return `<img src="${link.slice(1, link.length - 1)}" alt="${alt.slice(2, alt.length - 1)}">`;
-                });
-            }
-
-            // Links
-            if (s.match(/\[.*]\(.*\)/)) {
-                s = s.replace(/\[.*]\(.*\)/, match => {
-                    const name = match.match(/\[.*]/)[0];
-                    const link = match.match(/\(.*\)/)[0];
-                    return `<a href="${link.slice(1, link.length - 1)}" target="_blank">${name.slice(1, name.length - 1)}</a>`;
-                });
-            }
-
-            // Emphasized
-            if (s.match(/(\*\*.*\*\*|__.*__)/))
-                s = s.replace(/(\*\*.*\*\*|__.*__)/, match => '<strong>' + match.slice(2, match.length - 2) + '</strong>');
-            if (s.match(/(\*.*\*|_.*_)/))
-                s = s.replace(/(\*.*\*|_.*_)/, match => '<i>' + match.slice(1, match.length - 1) + '</i>');
-            if (s.match(/~~.*~~/))
-                s = s.replace(/~~.*~~/, match => '<s>' + match.slice(2, match.length - 2) + '</s>');
-
             htmlString += s + '<br/>';
         }
+
+        // Images
+        htmlString = htmlString.replace(/!\[.*?]\(.*?\)/g, match => {
+            const alt = match.match(/!\[.*]/)[0];
+            const link = match.match(/\(.*\)/)[0];
+            return `<img src="${link.slice(1, link.length - 1)}" alt="${alt.slice(2, alt.length - 1)}">`;
+        });
+        // Links
+        htmlString = htmlString.replace(/\[.*?]\(.*?\)/g, match => {
+            const name = match.match(/\[.*]/)[0];
+            const link = match.match(/\(.*\)/)[0];
+            return `<a href="${link.slice(1, link.length - 1)}" target="_blank">${name.slice(1, name.length - 1)}</a>`;
+        });
+        // Emphasized
+        htmlString = htmlString.replace(/(\*\*.*?\*\*|__.*?__)/, match => '<strong>' + match.slice(2, match.length - 2) + '</strong>');
+        htmlString = htmlString.replace(/(\*.*?\*|_.*?_)/, match => '<i>' + match.slice(1, match.length - 1) + '</i>');
+        htmlString = htmlString.replace(/~~.*?~~/, match => '<s>' + match.slice(2, match.length - 2) + '</s>');
 
         htmlString = mdEdit.parseCode(htmlString);
         /*

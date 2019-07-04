@@ -5,6 +5,9 @@ class mdEdit {
         this.init();
     }
 
+    /**
+     * Initialize markdown editor
+     */
     init() {
         const mdBox = document.createElement('div');
         const bar = document.createElement('div');
@@ -35,22 +38,28 @@ class mdEdit {
         this.interpret();
     }
 
+    /**
+     * Interprets text from the editor
+     */
     interpret() {
-        this.getText();
+        this.toInterpret = this.editor.value;
         this.interpreted = this.md2html();
         this.showInterpreted();
     }
 
-    getText() {
-        this.toInterpret = this.editor.value;
-    }
-
+    /**
+     * Displays interpreted text
+     */
     showInterpreted() {
         this.displayContent.open();
         this.displayContent.write(this.interpreted);
         this.displayContent.close();
     }
 
+    /**
+     * Parses markdown to HTML
+     * @returns {string}
+     */
     md2html() {
         let htmlString = '';
         for (let s of this.toInterpret.split('\n')) {
@@ -100,6 +109,11 @@ class mdEdit {
         return htmlString;
     }
 
+    /**
+     * Parses markdown code blocks
+     * @param s
+     * @returns {string}
+     */
     static parseCode(s) {
         return s.replace(/`{3}.*`{3}|`.*`/, match => {
             if (match.startsWith('\`\`\`')) return `<pre><code>${match.slice(3, match.length - 3)}</code></pre>`;

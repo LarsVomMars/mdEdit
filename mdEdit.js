@@ -110,12 +110,12 @@ class mdEdit {
     }
 
     /**
-     * Parses markdown code blocks
+     * Parses markdown code blocks to HTML string
      * @param s
      * @returns {string}
      */
     static parseCode(s) {
-        return s.replace(/`{3}.*`{3}|`.*`/, match => {
+        return s.replace(/`{3}.*?`{3}|`.*?`/g, match => {
             if (match.startsWith('\`\`\`')) return `<pre><code>${match.slice(3, match.length - 3)}</code></pre>`;
             return `<pre><code>${match.slice(1, match.length - 1)}</code></pre>`;
         })

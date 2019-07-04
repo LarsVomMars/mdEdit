@@ -67,6 +67,17 @@ class mdEdit {
             else if (s.match(/^#.+$/))
                 s = s.replace(/^#.+$/, match => '<h1>' + match.slice(1) + '</h1>');
 
+            // Links
+            // TODO: Check links; Open links in new tab
+            if (s.match(/\[.*\]\(.*\)/)) {
+                s = s.replace(/\[.*\]\(.*\)/, match => {
+                    const name = match.match(/\[.*\]/)[0];
+                    const link = match.match(/\(.*\)/)[0];
+                    return `<a href="${link.slice(1, link.length - 1)}" target="blank">${name.slice(1, name.length - 1)}</a>`;
+                });
+            }
+
+            // Emphasized
             if (s.match(/(\*\*.*\*\*|__.*__)/))
                 s = s.replace(/(\*\*.*\*\*|__.*__)/, match => '<strong>' + match.slice(2, match.length - 2) + '</strong>');
             if (s.match(/(\*.*\*|_.*_)/))
@@ -74,6 +85,7 @@ class mdEdit {
             if (s.match(/~~.*~~/))
                 s = s.replace(/~~.*~~/, match => '<s>' + match.slice(2, match.length - 2) + '</s>');
 
+            
             htmlString += s;
         }
         return htmlString;

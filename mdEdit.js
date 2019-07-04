@@ -2,6 +2,7 @@ class mdEdit {
     constructor(text) {
         this.toInterpret = text;
         this.interpreted = '';
+        this.tables = [];
         this.init();
     }
 
@@ -53,14 +54,17 @@ class mdEdit {
 
     md2html() {
         let htmlString = '';
-        for (let s of this.toInterpret.split('\n')) {
+
+        for (let i in this.toInterpret.split('\n')) {
+            let s = this.toInterpret.split('\n')[i];
+
             // Headings
-            s = s.replace(/^######.+$/, match => '<h6>' + match.slice(6) + '</h6>');
-            s = s.replace(/^#####.+$/, match => '<h5>' + match.slice(5) + '</h5>');
-            s = s.replace(/^####.+$/, match => '<h4>' + match.slice(4) + '</h4>');
-            s = s.replace(/^###.+$/, match => '<h3>' + match.slice(3) + '</h3>');
-            s = s.replace(/^##.+$/, match => '<h2>' + match.slice(2) + '</h2>');
-            s = s.replace(/^#.+$/, match => '<h1>' + match.slice(1) + '</h1>');
+            s = s.replace(/^######.+$/, match => '<h6>' + match.slice(6) + '</h6>')
+                .replace(/^#####.+$/, match => '<h5>' + match.slice(5) + '</h5>')
+                .replace(/^####.+$/, match => '<h4>' + match.slice(4) + '</h4>')
+                .replace(/^###.+$/, match => '<h3>' + match.slice(3) + '</h3>')
+                .replace(/^##.+$/, match => '<h2>' + match.slice(2) + '</h2>')
+                .replace(/^#.+$/, match => '<h1>' + match.slice(1) + '</h1>');
 
             // Images
             if (s.match(/!\[.*]\(.*\)/)) {
@@ -69,6 +73,19 @@ class mdEdit {
                     const link = match.match(/\(.*\)/)[0];
                     return `<img src="${link.slice(1, link.length - 1)}" alt="${alt.slice(2, alt.length - 1)}">`;
                 });
+            }
+
+            // Tables
+            if (s.match(/^\|(.*\|)?$/igm)) {
+                console.log(this.tables);
+                const exists = this.tables.map(table => table.includes(i.toString())).filter(elem => elem === true).length > 0;
+                const prevExists = this.tables.map(table => table.includes((i - 1).toString())).filter(elem => elem === true).length > 0;
+
+                if (!exists && prevExists) {
+                    this.tables[this.tables.map(table => table.includes((i - 1).toString())).indexOf(true)].push(i);
+                } else if (!exists) {
+                    this.tables.push([i]) // New table
+                }
             }
 
             // Links

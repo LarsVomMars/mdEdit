@@ -18,7 +18,7 @@ class mdEdit {
         editor.classList.add('md', 'md-editor');
         display.classList.add('md', 'md-display');
 
-        displayIframe.sandbox = 'allow-same-origin';
+        displayIframe.sandbox = 'allow-same-origin allow-popups';
 
         editor.append(editorTextarea);
         display.append(displayIframe);
@@ -55,26 +55,26 @@ class mdEdit {
         let htmlString = '';
         for (let s of this.toInterpret.split('\n')) {
             // Headings
-            if (s.match(/^######.+$/))
+            //if (s.match(/^######.+$/))
                 s = s.replace(/^######.+$/, match => '<h6>' + match.slice(6) + '</h6>');
-            else if (s.match(/^#####.+$/))
+            //else if (s.match(/^#####.+$/))
                 s = s.replace(/^#####.+$/, match => '<h5>' + match.slice(5) + '</h5>');
-            else if (s.match(/^####.+$/))
+            //else if (s.match(/^####.+$/))
                 s = s.replace(/^####.+$/, match => '<h4>' + match.slice(4) + '</h4>');
-            else if (s.match(/^###.+$/))
+            //else if (s.match(/^###.+$/))
                 s = s.replace(/^###.+$/, match => '<h3>' + match.slice(3) + '</h3>');
-            else if (s.match(/^##.+$/))
+            //else if (s.match(/^##.+$/))
                 s = s.replace(/^##.+$/, match => '<h2>' + match.slice(2) + '</h2>');
-            else if (s.match(/^#.+$/))
+            //else if (s.match(/^#.+$/))
                 s = s.replace(/^#.+$/, match => '<h1>' + match.slice(1) + '</h1>');
 
             // Links
             // TODO: Check links; Open links in new tab
-            if (s.match(/\[.*\]\(.*\)/)) {
-                s = s.replace(/\[.*\]\(.*\)/, match => {
-                    const name = match.match(/\[.*\]/)[0];
+            if (s.match(/\[.*]\(.*\)/)) {
+                s = s.replace(/\[.*]\(.*\)/, match => {
+                    const name = match.match(/\[.*]/)[0];
                     const link = match.match(/\(.*\)/)[0];
-                    return `<a href="${link.slice(1, link.length - 1)}" target="blank">${name.slice(1, name.length - 1)}</a>`;
+                    return `<a href="${link.slice(1, link.length - 1)}" target="_blank">${name.slice(1, name.length - 1)}</a>`;
                 });
             }
 

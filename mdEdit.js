@@ -55,21 +55,23 @@ class mdEdit {
         let htmlString = '';
         for (let s of this.toInterpret.split('\n')) {
             // Headings
-            //if (s.match(/^######.+$/))
-                s = s.replace(/^######.+$/, match => '<h6>' + match.slice(6) + '</h6>');
-            //else if (s.match(/^#####.+$/))
-                s = s.replace(/^#####.+$/, match => '<h5>' + match.slice(5) + '</h5>');
-            //else if (s.match(/^####.+$/))
-                s = s.replace(/^####.+$/, match => '<h4>' + match.slice(4) + '</h4>');
-            //else if (s.match(/^###.+$/))
-                s = s.replace(/^###.+$/, match => '<h3>' + match.slice(3) + '</h3>');
-            //else if (s.match(/^##.+$/))
-                s = s.replace(/^##.+$/, match => '<h2>' + match.slice(2) + '</h2>');
-            //else if (s.match(/^#.+$/))
-                s = s.replace(/^#.+$/, match => '<h1>' + match.slice(1) + '</h1>');
+            s = s.replace(/^######.+$/, match => '<h6>' + match.slice(6) + '</h6>');
+            s = s.replace(/^#####.+$/, match => '<h5>' + match.slice(5) + '</h5>');
+            s = s.replace(/^####.+$/, match => '<h4>' + match.slice(4) + '</h4>');
+            s = s.replace(/^###.+$/, match => '<h3>' + match.slice(3) + '</h3>');
+            s = s.replace(/^##.+$/, match => '<h2>' + match.slice(2) + '</h2>');
+            s = s.replace(/^#.+$/, match => '<h1>' + match.slice(1) + '</h1>');
+
+            // Images
+            if (s.match(/!\[.*]\(.*\)/)) {
+                s = s.replace(/!\[.*]\(.*\)/, match => {
+                    const alt = match.match(/!\[.*]/)[0];
+                    const link = match.match(/\(.*\)/)[0];
+                    return `<img src="${link.slice(1, link.length - 1)}" alt="${alt.slice(2, alt.length - 1)}">`;
+                });
+            }
 
             // Links
-            // TODO: Check links; Open links in new tab
             if (s.match(/\[.*]\(.*\)/)) {
                 s = s.replace(/\[.*]\(.*\)/, match => {
                     const name = match.match(/\[.*]/)[0];

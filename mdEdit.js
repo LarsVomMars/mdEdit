@@ -63,12 +63,13 @@ class mdEdit {
      */
     md2html() {
         let htmlString = '';
-        let split = this.toInterpret.split('\n');
+        const split = this.toInterpret.split('\n');
 
-        // Tables // TODO: Clear table on change (eg table to heading)
+        // Tables
+        // TODO: Clear table on change (eg table to heading)
         for (let i in split) {
-            let s = split[i];
-            if (s.match(/^\|(.*\|)?$/igm)) {
+            const s = split[i];
+            if (s.match(/^\|(.*?\|)?$/igm)) {
                 console.log(this.tables);
                 const exists = this.tables.map(table => table.includes(i.toString())).filter(elem => elem === true).length > 0;
                 const prevExists = this.tables.map(table => table.includes((i - 1).toString())).filter(elem => elem === true).length > 0;
@@ -82,7 +83,7 @@ class mdEdit {
         }
 
         // Other table stuff
-        let oldSplit = split.slice(0);
+        const oldSplit = split.slice(0);
         for (let table of this.tables) {
             split[parseInt(table[0])] = "<table>";
             for (let lineNum of table) {
@@ -99,40 +100,38 @@ class mdEdit {
 
         // Replace headings
         for (let s of split) {
-            // Headings
-            s = s.replace(/^######.+$/, match => '<h6>' + match.slice(6) + '</h6>');
-            s = s.replace(/^#####.+$/, match => '<h5>' + match.slice(5) + '</h5>');
-            s = s.replace(/^####.+$/, match => '<h4>' + match.slice(4) + '</h4>');
-            s = s.replace(/^###.+$/, match => '<h3>' + match.slice(3) + '</h3>');
-            s = s.replace(/^##.+$/, match => '<h2>' + match.slice(2) + '</h2>');
-            s = s.replace(/^#.+$/, match => '<h1>' + match.slice(1) + '</h1>');
+            s = s.replace(/^######.+$/, match => '<h6>' + match.slice(6) + '</h6>')
+                .replace(/^#####.+$/, match => '<h5>' + match.slice(5) + '</h5>')
+                .replace(/^####.+$/, match => '<h4>' + match.slice(4) + '</h4>')
+                .replace(/^###.+$/, match => '<h3>' + match.slice(3) + '</h3>')
+                .replace(/^##.+$/, match => '<h2>' + match.slice(2) + '</h2>')
+                .replace(/^#.+$/, match => '<h1>' + match.slice(1) + '</h1>');
             htmlString += s + '<br/>';
         }
 
         // Images
         htmlString = htmlString.replace(/!\[.*?]\(.*?\)/g, match => {
-            const alt = match.match(/!\[.*]/)[0];
-            const link = match.match(/\(.*\)/)[0];
+            const alt = match.match(/!\[.*?]/)[0];
+            const link = match.match(/\(.*?\)/)[0];
             return `<img src="${link.slice(1, link.length - 1)}" alt="${alt.slice(2, alt.length - 1)}">`;
         });
+
         // Links
         htmlString = htmlString.replace(/\[.*?]\(.*?\)/g, match => {
-            const name = match.match(/\[.*]/)[0];
-            const link = match.match(/\(.*\)/)[0];
+            const name = match.match(/\[.*?]/)[0];
+            const link = match.match(/\(.*?\)/)[0];
             return `<a href="${link.slice(1, link.length - 1)}" target="_blank">${name.slice(1, name.length - 1)}</a>`;
         });
+
         // Emphasized
-        htmlString = htmlString.replace(/(\*\*.*?\*\*|__.*?__)/, match => '<strong>' + match.slice(2, match.length - 2) + '</strong>');
-        htmlString = htmlString.replace(/(\*.*?\*|_.*?_)/, match => '<i>' + match.slice(1, match.length - 1) + '</i>');
-        htmlString = htmlString.replace(/~~.*?~~/, match => '<s>' + match.slice(2, match.length - 2) + '</s>');
+        htmlString = htmlString.replace(/(\*\*.*?\*\*|__.*?__)/, match => '<strong>' + match.slice(2, match.length - 2) + '</strong>')
+            .replace(/(\*.*?\*|_.*?_)/, match => '<i>' + match.slice(1, match.length - 1) + '</i>')
+            .replace(/~~.*?~~/, match => '<s>' + match.slice(2, match.length - 2) + '</s>');
 
         htmlString = mdEdit.parseCode(htmlString);
-        /*
-            s = this.parseLists();
-            s = this.parseTable();
-        */
+
         return htmlString;
-}
+    }
 
     /**
      * Parses markdown code blocks to HTML string
@@ -141,7 +140,7 @@ class mdEdit {
      */
     static parseCode(s) {
         return s.replace(/`{3}.*?`{3}|`.*?`/g, match => {
-            if (match.startsWith('\`\`\`')) return `<pre><code>${match.slice(3, match.length - 3)}</code></pre>`;
+            if (match.startsWith('```')) return `<pre><code>${match.slice(3, match.length - 3)}</code></pre>`;
             return `<pre><code>${match.slice(1, match.length - 1)}</code></pre>`;
         })
     }

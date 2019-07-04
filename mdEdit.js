@@ -70,15 +70,10 @@ class mdEdit {
         for (let i in split) {
             const s = split[i];
             if (s.match(/^\|(.*?\|)?$/igm)) {
-                console.log(this.tables);
                 const exists = this.tables.map(table => table.includes(i.toString())).filter(elem => elem === true).length > 0;
                 const prevExists = this.tables.map(table => table.includes((i - 1).toString())).filter(elem => elem === true).length > 0;
-
-                if (!exists && prevExists) {
-                    this.tables[this.tables.map(table => table.includes((i - 1).toString())).indexOf(true)].push(i);
-                } else if (!exists) {
-                    this.tables.push([i]) // New table
-                }
+                if (!exists && prevExists) this.tables[this.tables.map(table => table.includes((i - 1).toString())).indexOf(true)].push(i);
+                else if (!exists) this.tables.push([i]) // New table
             }
         }
 
@@ -90,9 +85,7 @@ class mdEdit {
                 if (lineNum === table[0]) split[parseInt(lineNum)] += "<tr>";
                 else split[parseInt(lineNum)] = "<tr>";
                 const lineTokens = oldSplit[parseInt(lineNum)].split("|").filter(elem => elem !== "");
-                for (let token of lineTokens) {
-                    split[parseInt(lineNum)] += "<td>" + token + "</td>"
-                }
+                for (let token of lineTokens) split[parseInt(lineNum)] += "<td>" + token + "</td>";
                 split[parseInt(lineNum)] += "</tr>";
             }
             split[parseInt(table[table.length - 1])] += "</table>";
@@ -129,7 +122,6 @@ class mdEdit {
             .replace(/~~.*?~~/, match => '<s>' + match.slice(2, match.length - 2) + '</s>');
 
         htmlString = mdEdit.parseCode(htmlString);
-
         return htmlString;
     }
 

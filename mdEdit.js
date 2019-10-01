@@ -62,78 +62,51 @@ class mdEdit {
      * @returns {string}
      */
     md2html() {
-        let htmlString = '';
         const split = this.toInterpret.split('\n');
+        for (let i = 0; i < split.length; i++) {
+            let s = split[i];
+            let smo = undefined;
+            if (i > 0) smo = split[i-1];
 
-        // Tables
-        // TODO: Clear table on change (eg table to heading)
-        for (let i in split) {
-            const s = split[i];
-            if (s.match(/^\|(.*?\|)?$/igm)) {
-                const exists = this.tables.map(table => table.includes(i.toString())).filter(elem => elem === true).length > 0;
-                const prevExists = this.tables.map(table => table.includes((i - 1).toString())).filter(elem => elem === true).length > 0;
-                if (!exists && prevExists) this.tables[this.tables.map(table => table.includes((i - 1).toString())).indexOf(true)].push(i);
-                else if (!exists) this.tables.push([i]) // New table
-            }
-        }
-
-        // Other table stuff
-        const oldSplit = split.slice(0);
-        for (let table of this.tables) {
-            split[parseInt(table[0])] = "<table>";
-            for (let lineNum of table) {
-                if (lineNum === table[0]) split[parseInt(lineNum)] += "<tr>";
-                else split[parseInt(lineNum)] = "<tr>";
-                const lineTokens = oldSplit[parseInt(lineNum)].split("|").filter(elem => elem !== "");
-                for (let token of lineTokens) split[parseInt(lineNum)] += "<td>" + token + "</td>";
-                split[parseInt(lineNum)] += "</tr>";
-            }
-            split[parseInt(table[table.length - 1])] += "</table>";
-        }
-
-        // Replace headings
-        for (const s of split) {
-            htmlString += s.replace(/^######.+$/, match => '<h6>' + match.slice(6) + '</h6>')
+            // Headings
+            s = s.replace(/^######.+$/, match => '<h6>' + match.slice(6) + '</h6>')
                 .replace(/^#####.+$/, match => '<h5>' + match.slice(5) + '</h5>')
                 .replace(/^####.+$/, match => '<h4>' + match.slice(4) + '</h4>')
                 .replace(/^###.+$/, match => '<h3>' + match.slice(3) + '</h3>')
                 .replace(/^##.+$/, match => '<h2>' + match.slice(2) + '</h2>')
                 .replace(/^#.+$/, match => '<h1>' + match.slice(1) + '</h1>');
+
+            // Images
+            s = s.replace(/!\[.*?]\(.*?\)/g, match => {
+                const alt = match.match(/!\[.*?]/)[0];
+                const link = match.match(/\(.*?\)/)[0];
+                return `<img src="${link.slice(1, link.length - 1)}" alt="${alt.slice(2, alt.length - 1)}">`;
+            });
+
+            // Links
+            s = s.replace(/\[.*?]\(.*?\)/g, match => {
+                const name = match.match(/\[.*?]/)[0];
+                const link = match.match(/\(.*?\)/)[0];
+                return `<a href="${link.slice(1, link.length - 1)}" target="_blank">${name.slice(1, name.length - 1)}</a>`;
+            });
+
+            // Emphasized
+            s = s.replace(/(\*\*.*?\*\*|__.*?__)/, match => '<strong>' + match.slice(2, match.length - 2) + '</strong>')
+                .replace(/(\*.*?\*|_.*?_)/, match => '<i>' + match.slice(1, match.length - 1) + '</i>')
+                .replace(/~~.*?~~/, match => '<s>' + match.slice(2, match.length - 2) + '</s>');
+
+            // Alternativ headings
+            if (/^=+$/.test(s.trim())) {
+                s = `<h1>${smo}</h1>`;
+                delete split[i-1];
+            } else if (/^-+$/.test(s.trim())) {
+                s = `<h2>${smo}</h2>`;
+                delete split[i-1];
+            }
+
+            split[i] = s;
         }
-
-        // Images
-        htmlString = htmlString.replace(/!\[.*?]\(.*?\)/g, match => {
-            const alt = match.match(/!\[.*?]/)[0];
-            const link = match.match(/\(.*?\)/)[0];
-            return `<img src="${link.slice(1, link.length - 1)}" alt="${alt.slice(2, alt.length - 1)}">`;
-        });
-
-        // Links
-        htmlString = htmlString.replace(/\[.*?]\(.*?\)/g, match => {
-            const name = match.match(/\[.*?]/)[0];
-            const link = match.match(/\(.*?\)/)[0];
-            return `<a href="${link.slice(1, link.length - 1)}" target="_blank">${name.slice(1, name.length - 1)}</a>`;
-        });
-
-        // Emphasized
-        htmlString = htmlString.replace(/(\*\*.*?\*\*|__.*?__)/, match => '<strong>' + match.slice(2, match.length - 2) + '</strong>')
-            .replace(/(\*.*?\*|_.*?_)/, match => '<i>' + match.slice(1, match.length - 1) + '</i>')
-            .replace(/~~.*?~~/, match => '<s>' + match.slice(2, match.length - 2) + '</s>');
-
-        htmlString = mdEdit.parseCode(htmlString);
-        return htmlString;
-    }
-
-    /**
-     * Parses markdown code blocks to HTML string
-     * @param s
-     * @returns {string}
-     */
-    static parseCode(s) {
-        return s.replace(/`{3}.*?`{3}|`.*?`/g, match => {
-            if (match.startsWith('```')) return `<pre><code>${match.slice(3, match.length - 3)}</code></pre>`;
-            return `<pre><code>${match.slice(1, match.length - 1)}</code></pre>`;
-        })
+        return split.join('\n');
     }
 }
 
